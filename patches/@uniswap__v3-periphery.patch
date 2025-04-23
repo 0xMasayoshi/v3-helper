@@ -1,0 +1,13 @@
+diff --git a/contracts/libraries/PositionValue.sol b/contracts/libraries/PositionValue.sol
+index 265fc042f0fdca6abc404f2fbb28a26f8779f242..728151ca2cada09d21ad852d5ad91f8136f08376 100644
+--- a/contracts/libraries/PositionValue.sol
++++ b/contracts/libraries/PositionValue.sol
+@@ -109,7 +109,7 @@ library PositionValue {
+     }
+ 
+     function _fees(INonfungiblePositionManager positionManager, FeeParams memory feeParams)
+-        private
++        internal
+         view
+         returns (uint256 amount0, uint256 amount1)
+     {
