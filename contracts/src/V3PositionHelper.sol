@@ -77,10 +77,8 @@ contract V3PositionHelper {
                     tickLower: position.tickLower,
                     tickUpper: position.tickUpper,
                     liquidity: position.liquidity,
-                    positionFeeGrowthInside0LastX128: position
-                        .feeGrowthInside0LastX128,
-                    positionFeeGrowthInside1LastX128: position
-                        .feeGrowthInside1LastX128,
+                    positionFeeGrowthInside0LastX128: position.feeGrowthInside0LastX128,
+                    positionFeeGrowthInside1LastX128: position.feeGrowthInside1LastX128,
                     tokensOwed0: position.tokensOwed0,
                     tokensOwed1: position.tokensOwed1
                 })
@@ -129,10 +127,7 @@ contract V3PositionHelper {
         positions = new Position[](count);
 
         for (uint256 i = 0; i < count; i++) {
-            uint256 tokenId = positionManager.tokenOfOwnerByIndex(
-                user,
-                skip + i
-            );
+            uint256 tokenId = positionManager.tokenOfOwnerByIndex(user, skip + i);
             positions[i] = getPosition(positionManager, tokenId);
         }
     }

@@ -90,9 +90,9 @@ const config: HardhatUserConfig = {
       evmVersion: "istanbul",
       optimizer: {
         enabled: true,
-        runs: 1_000_000
-      }
-    }
+        runs: 1_000_000,
+      },
+    },
   },
   zksolc: {
     version: "1.5.13",
