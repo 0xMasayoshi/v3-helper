@@ -2,7 +2,7 @@
 pragma solidity =0.7.6;
 pragma abicoder v2;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {V3PositionHelper, Position} from "../src/V3PositionHelper.sol";
 import {INonfungiblePositionManager} from "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
@@ -11,9 +11,9 @@ contract V3PositionHelperTest is Test {
     INonfungiblePositionManager private positionManager;
 
     // Example Arbitrum user holding several Uniswap V3 positions
-    address constant TEST_USER = 0x3808699Baf43ba988d1e9acd64237DEA36c61593;
+    address private constant TEST_USER = 0x3808699Baf43ba988d1e9acd64237DEA36c61593;
     // Uniswap V3 NonfungiblePositionManager on Arbitrum
-    address constant MANAGER_ADDRESS = 0xF0cBce1942A68BEB3d1b73F0dd86C8DCc363eF49;
+    address private constant MANAGER_ADDRESS = 0xF0cBce1942A68BEB3d1b73F0dd86C8DCc363eF49;
 
     function setUp() public {
         // Fork Arbitrum mainnet for testing against live data
@@ -27,7 +27,7 @@ contract V3PositionHelperTest is Test {
     }
 
     /// @notice Should return all positions for TEST_USER
-    function testFetchAllUserPositions() public {
+    function testFetchAllUserPositions() public view {
         uint256 total = positionManager.balanceOf(TEST_USER);
         Position[] memory positions = positionHelper.getUserPositions(positionManager, TEST_USER, 0, total);
 
@@ -41,7 +41,7 @@ contract V3PositionHelperTest is Test {
     }
 
     /// @notice Tests paging over user positions
-    function testFetchUserPositionsInPages() public {
+    function testFetchUserPositionsInPages() public view {
         uint256 total = positionManager.balanceOf(TEST_USER);
         if (total < 2) return; // nothing to page
 
@@ -60,14 +60,14 @@ contract V3PositionHelperTest is Test {
     }
 
     /// @notice Skipping beyond the user's position count returns an empty array
-    function testSkipBeyondBalanceReturnsEmpty() public {
+    function testSkipBeyondBalanceReturnsEmpty() public view {
         uint256 total = positionManager.balanceOf(TEST_USER);
         Position[] memory empty = positionHelper.getUserPositions(positionManager, TEST_USER, total + 10, 5);
         assertEq(empty.length, 0, "Expected no positions when skipping past end");
     }
 
     /// @notice Sanity-check specific token IDs manually
-    function testFetchSpecificPositions() public {
+    function testFetchSpecificPositions() public view {
         // Hardcoded sample IDs (must exist on Arbitrum)
         uint256[] memory samples = new uint256[](3);
         samples[0] = 69;

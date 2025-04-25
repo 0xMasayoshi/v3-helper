@@ -14,7 +14,7 @@ async function main() {
 
   const balance = await hre.ethers.provider.getBalance(deployer.address);
   console.log(
-    `Deployer balance: ${GREEN}${hre.ethers.formatEther(balance)} ETH${RESET}\n`
+    `Deployer balance: ${GREEN}${hre.ethers.formatEther(balance)} ETH${RESET}\n`,
   );
 
   const contractName = "V3PositionHelper";

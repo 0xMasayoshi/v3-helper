@@ -1256,16 +1256,22 @@ const config: HardhatUserConfig = {
     },
     skaleEuropa: {
       chainId: 2046399126,
-      url: vars.get("SKALE_EUROPA_URL", "https://mainnet.skalenodes.com/v1/elated-tan-skat"),
+      url: vars.get(
+        "SKALE_EUROPA_URL",
+        "https://mainnet.skalenodes.com/v1/elated-tan-skat",
+      ),
       accounts,
       ledgerAccounts,
     },
     thundercoreMain: {
       chainId: 108,
-      url: vars.get("THUNDERCORE_MAINNET_URL", "https://mainnet-rpc.thundercore.com"),
+      url: vars.get(
+        "THUNDERCORE_MAINNET_URL",
+        "https://mainnet-rpc.thundercore.com",
+      ),
       accounts,
       ledgerAccounts,
-    }
+    },
   },
   // xdeploy: {
   //   // Change this name to the name of your main contract
@@ -1571,7 +1577,6 @@ const config: HardhatUserConfig = {
       skaleEuropa: vars.get("SKALE_API_KEY", ""),
       // For Thundercore Mainnet
       thundercore: vars.get("THUNDERCORE_API_KEY", ""),
-
     },
     customChains: [
       {
@@ -2653,17 +2658,17 @@ const config: HardhatUserConfig = {
         chainId: 2046399126,
         urls: {
           apiURL: "https://elated-tan-skat.explorer.mainnet.skalenodes.com/api",
-          browserURL: "https://elated-tan-skat.explorer.mainnet.skalenodes.com"
-        }
+          browserURL: "https://elated-tan-skat.explorer.mainnet.skalenodes.com",
+        },
       },
       {
         network: "thundercore",
         chainId: 108,
         urls: {
           apiURL: "https://explorer-mainnet.thundercore.com/api",
-          browserURL: "https://explorer-mainnet.thundercore.com"
-        }
-      }
+          browserURL: "https://explorer-mainnet.thundercore.com",
+        },
+      },
     ],
   },
   // tenderly: {
