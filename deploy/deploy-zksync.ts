@@ -30,14 +30,15 @@ export default async function main(hre: HardhatRuntimeEnvironment) {
   const wallet = new Wallet(PRIVATE_KEY);
   const deployer = new Deployer(hre, wallet);
 
-  const constructorArgs = ["Hello, Hardhat!"];
-  const artifact = await deployer.loadArtifact("Greeter");
-  const contract = await deployer.deploy(artifact, constructorArgs);
+  const artifact = await deployer.loadArtifact("V3PositionHelper");
+  const contract = await deployer.deploy(artifact);
 
   await contract.waitForDeployment();
   const contractAddress = await contract.getAddress();
 
-  console.log("Greeter deployed to: " + `${GREEN}${contractAddress}${RESET}\n`);
+  console.log(
+    "V3PositionHelper deployed to: " + `${GREEN}${contractAddress}${RESET}\n`,
+  );
 
   console.log(
     "Waiting 30 seconds before beginning the contract verification to allow the block explorer to index the contract...\n",
@@ -46,6 +47,5 @@ export default async function main(hre: HardhatRuntimeEnvironment) {
 
   await hre.run("verify:verify", {
     address: contractAddress,
-    constructorArguments: constructorArgs,
   });
 }

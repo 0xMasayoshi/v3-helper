@@ -8,7 +8,6 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-ignition-ethers";
 import "@typechain/hardhat";
 
-import "xdeployer";
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-deploy";
 import "@matterlabs/hardhat-zksync-verify";
@@ -24,7 +23,7 @@ import "hardhat-contract-sizer";
 // You must also uncomment the subsequent `tenderly` configuration in this file accordingly
 // import "@tenderly/hardhat-tenderly";
 
-const ethMainnetUrl = vars.get("ETH_MAINNET_URL", "https://rpc.ankr.com/eth");
+const ethMainnetUrl = vars.get("ETH_MAINNET_URL", "https://eth.llamarpc.com");
 const accounts = [
   vars.get(
     "PRIVATE_KEY",
@@ -288,7 +287,7 @@ const config: HardhatUserConfig = {
     },
     fantomMain: {
       chainId: 250,
-      url: vars.get("FANTOM_MAINNET_URL", "https://rpc.ankr.com/fantom"),
+      url: vars.get("FANTOM_MAINNET_URL", "https://1rpc.io/ftm"),
       accounts,
       ledgerAccounts,
     },
@@ -513,7 +512,7 @@ const config: HardhatUserConfig = {
     },
     filecoinMain: {
       chainId: 314,
-      url: vars.get("FILECOIN_MAINNET_URL", "https://rpc.ankr.com/filecoin"),
+      url: vars.get("FILECOIN_MAINNET_URL", "https://api.node.glif.io"),
       accounts,
       ledgerAccounts,
     },
@@ -525,7 +524,7 @@ const config: HardhatUserConfig = {
     },
     scrollMain: {
       chainId: 534352,
-      url: vars.get("SCROLL_MAINNET_URL", "https://rpc.scroll.io"),
+      url: vars.get("SCROLL_MAINNET_URL", "https://1rpc.io/scroll"),
       accounts,
       ledgerAccounts,
     },
@@ -1243,41 +1242,65 @@ const config: HardhatUserConfig = {
       accounts,
       ledgerAccounts,
     },
+    bttcMain: {
+      chainId: 199,
+      url: vars.get("BTTC_MAINNET_URL", "https://rpc.bittorrentchain.io"),
+      accounts,
+      ledgerAccounts,
+    },
+    haqqMain: {
+      chainId: 11235,
+      url: vars.get("HAQQ_MAINNET_URL", "https://evm.haqq.sh"),
+      accounts,
+      ledgerAccounts,
+    },
+    skaleEuropa: {
+      chainId: 2046399126,
+      url: vars.get("SKALE_EUROPA_URL", "https://mainnet.skalenodes.com/v1/elated-tan-skat"),
+      accounts,
+      ledgerAccounts,
+    },
+    thundercoreMain: {
+      chainId: 108,
+      url: vars.get("THUNDERCORE_MAINNET_URL", "https://mainnet-rpc.thundercore.com"),
+      accounts,
+      ledgerAccounts,
+    }
   },
-  xdeploy: {
-    // Change this name to the name of your main contract
-    // Does not necessarily have to match the contract file name
-    contract: "Greeter",
+  // xdeploy: {
+  //   // Change this name to the name of your main contract
+  //   // Does not necessarily have to match the contract file name
+  //   contract: "V3PositionHelper",
 
-    // Change to `undefined` if your constructor does not have any input arguments
-    constructorArgsPath: "./deploy-args.ts",
+  //   // Change to `undefined` if your constructor does not have any input arguments
+  //   constructorArgsPath: "./deploy-args.ts",
 
-    // The salt must be the same for each EVM chain for which you want to have a single contract address
-    // Change the salt if you are doing a re-deployment with the same codebase
-    salt: vars.get(
-      "SALT",
-      // `keccak256("SALT")`
-      "0x087ee6a43229fddc3e140062b42bcff0c6d1c5a3bba8123976a59688e7024c25",
-    ),
+  //   // The salt must be the same for each EVM chain for which you want to have a single contract address
+  //   // Change the salt if you are doing a re-deployment with the same codebase
+  //   salt: vars.get(
+  //     "SALT",
+  //     // `keccak256("SALT")`
+  //     "0x087ee6a43229fddc3e140062b42bcff0c6d1c5a3bba8123976a59688e7024c25",
+  //   ),
 
-    // This is your wallet's private key
-    signer: accounts[0],
+  //   // This is your wallet's private key
+  //   signer: accounts[0],
 
-    // Use the network names specified here: https://github.com/pcaversaccio/xdeployer#configuration
-    // Use `localhost` or `hardhat` for local testing
-    networks: ["hardhat", "sepolia", "optimismSepolia"],
+  //   // Use the network names specified here: https://github.com/pcaversaccio/xdeployer#configuration
+  //   // Use `localhost` or `hardhat` for local testing
+  //   networks: ["hardhat", "sepolia", "optimismSepolia"],
 
-    // Use the matching env URL with your chosen RPC in the `.env` file
-    rpcUrls: [
-      "hardhat",
-      vars.get("ETH_SEPOLIA_TESTNET_URL", "https://rpc.sepolia.org"),
-      vars.get("OPTIMISM_SEPOLIA_URL", "https://sepolia.optimism.io"),
-    ],
+  //   // Use the matching env URL with your chosen RPC in the `.env` file
+  //   rpcUrls: [
+  //     "hardhat",
+  //     vars.get("ETH_SEPOLIA_TESTNET_URL", "https://rpc.sepolia.org"),
+  //     vars.get("OPTIMISM_SEPOLIA_URL", "https://sepolia.optimism.io"),
+  //   ],
 
-    // Maximum limit is 15 * 10 ** 6 or 15,000,000. If the deployments are failing, try increasing this number
-    // However, keep in mind that this costs money in a production environment!
-    gasLimit: 1.2 * 10 ** 6,
-  },
+  //   // Maximum limit is 15 * 10 ** 6 or 15,000,000. If the deployments are failing, try increasing this number
+  //   // However, keep in mind that this costs money in a production environment!
+  //   gasLimit: 1.2 * 10 ** 6,
+  // },
   contractSizer: {
     alphaSort: true,
     runOnCompile: true,
@@ -1540,6 +1563,15 @@ const config: HardhatUserConfig = {
       // For Bitlayer testnet & mainnet
       bitlayer: vars.get("BITLAYER_API_KEY", ""),
       bitlayerTestnet: vars.get("BITLAYER_API_KEY", ""),
+      // For BTTC mainnet
+      bttc: vars.get("BTTC_API_KEY", ""),
+      // For Haqq mainnet
+      haqq: vars.get("HAQQ_API_KEY", ""),
+      // For SKALE Europa
+      skaleEuropa: vars.get("SKALE_API_KEY", ""),
+      // For Thundercore Mainnet
+      thundercore: vars.get("THUNDERCORE_API_KEY", ""),
+
     },
     customChains: [
       {
@@ -2600,6 +2632,38 @@ const config: HardhatUserConfig = {
           browserURL: "https://testnet.btrscan.com",
         },
       },
+      {
+        network: "bttc",
+        chainId: 199,
+        urls: {
+          apiURL: "https://api.bttcscan.com/api",
+          browserURL: "https://bttcscan.com/",
+        },
+      },
+      {
+        network: "haqq",
+        chainId: 11235,
+        urls: {
+          apiURL: "https://explorer.haqq.network/api",
+          browserURL: "https://explorer.haqq.network",
+        },
+      },
+      {
+        network: "skaleEuropa",
+        chainId: 2046399126,
+        urls: {
+          apiURL: "https://elated-tan-skat.explorer.mainnet.skalenodes.com/api",
+          browserURL: "https://elated-tan-skat.explorer.mainnet.skalenodes.com"
+        }
+      },
+      {
+        network: "thundercore",
+        chainId: 108,
+        urls: {
+          apiURL: "https://explorer-mainnet.thundercore.com/api",
+          browserURL: "https://explorer-mainnet.thundercore.com"
+        }
+      }
     ],
   },
   // tenderly: {

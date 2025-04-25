@@ -34,14 +34,6 @@ pnpm deploy:goerli
 
 > For the deployment on the [ZKsync Era](https://docs.zksync.io/) test network, you must add your to-be-deployed contract artifact to [`deploy-zksync.ts`](./deploy/deploy-zksync.ts), enable `zksync` in the [`hardhat.config.ts`](./hardhat.config.ts#L121) file, and then run `pnpm compile` (in case you face any compilation issues, disable all configurations associated with the [`@tenderly/hardhat-tenderly`](https://github.com/Tenderly/hardhat-tenderly) plugin, including the `import` statement itself; see also [here](https://github.com/matter-labs/hardhat-zksync/issues/998) and [here](https://github.com/matter-labs/hardhat-zksync/issues/1174)). Next, fund your deployer account on ZKsync Era Testnet, setup the ZKsync-related configuration variables accordingly, and simply run `pnpm deploy:zksynctestnet`. Eventually, to verify the contract you can invoke: `npx hardhat verify --network zkSyncTestnet --constructor-args arguments.js <YOUR_CONTRACT_ADDRESS>`. The same approach applies if you want to deploy on the production network, except that you need to run `pnpm deploy:zksyncmain` and use `--network zkSyncMain` for the contract verification.
 
-## Running `CREATE2` Deployments
-
-```console
-pnpm xdeploy
-```
-
-This template uses the [`xdeployer`](https://github.com/pcaversaccio/xdeployer) Hardhat plugin. Check out the documentation for more information on the specifics of the deployments.
-
 ## Configuration Variables
 
 Run `npx hardhat vars set PRIVATE_KEY` to set the private key of your wallet. This allows secure access to your wallet to use with both testnet and mainnet funds during Hardhat deployments.

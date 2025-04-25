@@ -1,0 +1,9 @@
+[
+  "function burn(int24,int24,uint128) returns (uint256, uint256)",
+  "function collect(address,int24,int24,uint128,uint128) returns (uint128, uint128)",
+  "function flash(address,uint256,uint256,bytes)",
+  "function increaseObservationCardinalityNext(uint16)",
+  "function initialize(uint160)",
+  "function mint(address,int24,int24,uint128,bytes) returns (uint256, uint256)",
+  "function swap(address,bool,int256,uint160,bytes) returns (int256, int256)"
+]

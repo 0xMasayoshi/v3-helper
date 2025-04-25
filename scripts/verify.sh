@@ -4,7 +4,7 @@ echo Which compiler version did you use to build?
 read version
 echo Selected compiler version: $version
 
-echo Which contract do you want to verify \(e.g. Greeter\)?
+echo Which contract do you want to verify \(e.g. V3PositionHelper\)?
 read contract
 echo Selected contract name: $contract
 

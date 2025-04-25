@@ -1,0 +1,4 @@
+[
+  "function WETH9() view returns (address)",
+  "function factory() view returns (address)"
+]

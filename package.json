@@ -36,7 +36,6 @@
     "test:forge": "forge test -vvv --root . -C contracts/src --match-path \"contracts/test/*\" --out forge-artifacts",
     "compile": "npx hardhat compile && forge build --root . -C contracts/src --optimize --out forge-artifacts",
     "size": "npx hardhat size-contracts",
-    "xdeploy": "npx hardhat xdeploy",
     "abi": "npx hardhat export-abi",
     "vars:path": "npx hardhat vars path",
     "evm": "npx hardhat evm",
@@ -205,6 +204,10 @@
     "deploy:bitlayermain": "npx hardhat run --network bitlayerMain scripts/deploy.ts",
     "deploy:ronintestnet": "npx hardhat run --network roninTestnet scripts/deploy.ts",
     "deploy:roninmain": "npx hardhat run --network roninMain scripts/deploy.ts",
+    "deploy:bttcmain": "npx hardhat run --network bttcMain scripts/deploy.ts",
+    "deploy:haqqmain": "npx hardhat run --network haqqMain scripts/deploy.ts",
+    "deploy:skaleeuropa": "npx hardhat run --network skaleEuropa scripts/deploy.ts",
+    "deploy:thundercoremain": "npx hardhat run --network thundercoreMain scripts/deploy.ts",
     "prettier:check": "npx prettier -c \"**/*.{js,ts,md,sol,json,yml,yaml}\"",
     "prettier:fix": "npx prettier -w \"**/*.{js,ts,md,sol,json,yml,yaml}\"",
     "solhint:check": "npx solhint \"contracts/**/*.sol\"",
@@ -253,7 +256,6 @@
     "typechain": "^8.3.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0",
-    "xdeployer": "^3.1.13",
     "zksync-ethers": "^6.17.0"
   },
   "pnpm": {

@@ -14,7 +14,7 @@ make -s mainnet-fork ETH_MAINNET_RPC_URL=$rpc &
 sleep 60
 
 # Read the contract name
-echo Which contract do you want to deploy \(e.g. Greeter\)?
+echo Which contract do you want to deploy \(e.g. V3PositionHelper\)?
 read contract
 
 # Read the constructor arguments

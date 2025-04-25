@@ -1,0 +1,4 @@
+[
+  "function collectProtocol(address,uint128,uint128) returns (uint128, uint128)",
+  "function setFeeProtocol(uint8,uint8)"
+]

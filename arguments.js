@@ -2,6 +2,4 @@
 // Required by the Hardhat plugin `hardhat-etherscan`
 // See also here: https://hardhat.org/plugins/nomiclabs-hardhat-etherscan.html#complex-arguments
 
-module.exports = [
-  "Hello, Hardhat!", // The example Greeter.sol file needs a string
-];
+module.exports = [];

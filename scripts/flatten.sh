@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Read the contract name
-echo Which contract do you want to flatten \(e.g. Greeter\)?
+echo Which contract do you want to flatten \(e.g. V3PositionHelper\)?
 read contract
 
 # Remove an existing flattened contract

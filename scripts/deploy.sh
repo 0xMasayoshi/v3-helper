@@ -11,7 +11,7 @@ echo Example: "0xabc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc
 read -s key
 
 # Read the contract name
-echo Which contract do you want to deploy \(e.g. Greeter\)?
+echo Which contract do you want to deploy \(e.g. V3PositionHelper\)?
 read contract
 
 # Read the constructor arguments
@@ -20,7 +20,7 @@ read -ra args
 
 if [ -z "$args" ]
 then
-  forge create -i ./contracts/src/${contract}.sol:${contract} --rpc-url $rpc --private-key $key
+  forge create -i ./contracts/src/${contract}.sol:${contract} --rpc-url $rpc --private-key $key --broadcast
 else
-  forge create -i ./contracts/src/${contract}.sol:${contract} --rpc-url $rpc --private-key $key --constructor-args ${args}
+  forge create -i ./contracts/src/${contract}.sol:${contract} --rpc-url $rpc --private-key $key --constructor-args ${args} --broadcast
 fi

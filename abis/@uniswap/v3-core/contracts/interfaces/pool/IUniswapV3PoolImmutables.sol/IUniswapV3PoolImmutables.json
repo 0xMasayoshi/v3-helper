@@ -1,0 +1,8 @@
+[
+  "function factory() view returns (address)",
+  "function fee() view returns (uint24)",
+  "function maxLiquidityPerTick() view returns (uint128)",
+  "function tickSpacing() view returns (int24)",
+  "function token0() view returns (address)",
+  "function token1() view returns (address)"
+]
