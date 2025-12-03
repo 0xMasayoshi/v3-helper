@@ -1,174 +1,176 @@
-# Fully-Fledged Hardhat Project Template Based on TypeScript
+# v3-helper
 
-[![🕵️‍♂️ Test smart contracts](https://github.com/pcaversaccio/hardhat-project-template-ts/actions/workflows/test-contracts.yml/badge.svg)](https://github.com/pcaversaccio/hardhat-project-template-ts/actions/workflows/test-contracts.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/mit)
+A lightweight set of utilities for interacting with **Uniswap V3 positions**, starting with the included `V3PositionHelper` contract.
+This helper returns **real-time fee accruals** for any Uniswap V3 LP NFT, fixing a long‑standing limitation of `INonfungiblePositionManager.positions()` where `tokensOwed0`/`tokensOwed1` become stale.
 
-## Installation
+More helpers may be added in the future — the current implementation focuses solely on the `V3PositionHelper` contract.
 
-It is recommended to install [`pnpm`](https://pnpm.io) through the `npm` package manager, which comes bundled with [Node.js](https://nodejs.org/en) when you install it on your system. It is recommended to use a Node.js version `>=22.11.0`.
+---
 
-Once you have `npm` installed, you can run the following both to install and upgrade `pnpm`:
+## Features
 
-```console
-npm install -g pnpm
+- Fetch full Uniswap V3 NFT position data including:
+  - ticks
+  - liquidity
+  - feeGrowth values
+  - operator, token addresses, etc.
+- **Real-time fee computation** using Uniswap's `PositionValue` library
+- Batch queries (`getPositions`)
+- Paginated user-owned position queries (`getUserPositions`)
+- Clean `Position` struct mirroring on-chain values with updated `tokensOwed*`
+
+---
+
+## Contract Overview
+
+### `V3PositionHelper.sol`
+
+The helper exposes three primary read functions:
+
+### `getPosition(positionManager, tokenId)`
+Returns a full position with **live** `tokensOwed0`/`tokensOwed1`, recomputed via `PositionValue._fees`.
+
+### `getPositions(positionManager, tokenIds[])`
+Batch version of `getPosition`.
+
+### `getUserPositions(positionManager, user, skip, first)`
+Efficient paginated retrieval of all positions owned by a wallet.
+
+---
+
+## Position Struct
+
+```solidity
+struct Position {
+    uint256 tokenId;
+    uint96 nonce;
+    address operator;
+    address token0;
+    address token1;
+    uint24 fee;
+    int24 tickLower;
+    int24 tickUpper;
+    uint128 liquidity;
+    uint256 feeGrowthInside0LastX128;
+    uint256 feeGrowthInside1LastX128;
+    uint128 tokensOwed0;
+    uint128 tokensOwed1;
+}
 ```
 
-After having installed `pnpm`, simply run:
+This mirrors Uniswap’s tuple exactly, with one key improvement:
+`tokensOwed0`/`tokensOwed1` reflect **current** unclaimed fees.
 
-```console
+---
+
+## Usage Example
+
+```solidity
+INonfungiblePositionManager pm = INonfungiblePositionManager(POSITION_MANAGER);
+V3PositionHelper helper = new V3PositionHelper();
+
+Position memory pos = helper.getPosition(pm, 12345);
+
+// pos.tokensOwed0 / pos.tokensOwed1 now include real-time fee accruals
+```
+
+---
+
+## Known Limitations
+
+### 🧩 Pools With Non-Standard Init Code Hashes
+
+`PositionValue._fees` depends on Uniswap's canonical pool address derivation:
+
+```
+keccak256(abi.encodePacked(
+    hex"ff",
+    factory,
+    keccak256(abi.encode(token0, token1, fee)),
+    POOL_INIT_CODE_HASH
+))
+```
+
+If a chain/fork/L2 deploys a Uniswap V3 implementation with a **different init code hash**, fee computation will fail or return zeroes because the library cannot locate the pool.
+
+This repo does **not yet** include a mechanism to override or dynamically detect the init code hash.
+
+Possible approaches (future enhancement):
+- Allow passing a custom init code hash as a parameter
+- Attempt on-chain probing of candidate hashes (expensive; not recommended)
+
+For now, this limitation is simply documented.
+
+---
+
+## Patch Required for `PositionValue`
+
+To access `_fees(...)` externally, the following change was applied via `pnpm patch`:
+
+```diff
+- function _fees(...) private view returns (...)
++ function _fees(...) internal view returns (...)
+```
+
+This repo expects that patched version of the Uniswap V3 periphery library.
+
+---
+
+## Development
+
+Install dependencies:
+
+```sh
 pnpm install
 ```
 
-## Running Deployments
+Build:
 
-> [!NOTE]
-> The deployment script [`deploy.ts`](./scripts/deploy.ts) attempts to automatically verify the contract on the target chain after deployment. If you have not configured an API key, the verification will fail.
-
-**Example Goerli:**
-
-```console
-pnpm deploy:goerli
+```sh
+pnpm compile
 ```
 
-> The deployment script [`deploy.ts`](./scripts/deploy.ts) includes the `tenderly` Hardhat Runtime Environment (HRE) extension with the `verify` method. Please consider uncommenting and configuring the Tenderly `project`, `username`, `forkNetwork`, `privateVerification`, and `deploymentsDir` attributes in the [`hardhat.config.ts`](./hardhat.config.ts) file before deploying or remove this call. Also, for this plugin to function you need to create a `config.yaml` file at `$HOME/.tenderly/config.yaml` or `%HOMEPATH%\.tenderly\config.yaml` and add an `access_key` field to it. For further information, see [here](https://github.com/Tenderly/hardhat-tenderly/tree/master/packages/hre-extender-v2#installing-tenderly-cli).
+Foundry:
 
-> For the deployment on the [ZKsync Era](https://docs.zksync.io/) test network, you must add your to-be-deployed contract artifact to [`deploy-zksync.ts`](./deploy/deploy-zksync.ts), enable `zksync` in the [`hardhat.config.ts`](./hardhat.config.ts#L121) file, and then run `pnpm compile` (in case you face any compilation issues, disable all configurations associated with the [`@tenderly/hardhat-tenderly`](https://github.com/Tenderly/hardhat-tenderly) plugin, including the `import` statement itself; see also [here](https://github.com/matter-labs/hardhat-zksync/issues/998) and [here](https://github.com/matter-labs/hardhat-zksync/issues/1174)). Next, fund your deployer account on ZKsync Era Testnet, setup the ZKsync-related configuration variables accordingly, and simply run `pnpm deploy:zksynctestnet`. Eventually, to verify the contract you can invoke: `npx hardhat verify --network zkSyncTestnet --constructor-args arguments.js <YOUR_CONTRACT_ADDRESS>`. The same approach applies if you want to deploy on the production network, except that you need to run `pnpm deploy:zksyncmain` and use `--network zkSyncMain` for the contract verification.
-
-## Configuration Variables
-
-Run `npx hardhat vars set PRIVATE_KEY` to set the private key of your wallet. This allows secure access to your wallet to use with both testnet and mainnet funds during Hardhat deployments.
-
-You can also run `npx hardhat vars setup` to see which other [configuration variables](https://hardhat.org/hardhat-runner/docs/guides/configuration-variables) are available.
-
-## Using a Ledger Hardware Wallet
-
-This template implements the [`hardhat-ledger`](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-ledger) plugin. Run `npx hardhat set LEDGER_ACCOUNT` and enter the address of the Ledger account you want to use.
-
-## Using the Truffle Dashboard
-
-> [!IMPORTANT]
-> Truffle has been [sunsetted](https://consensys.io/blog/consensys-announces-the-sunset-of-truffle-and-ganache-and-new-hardhat) by Consensys, but I still keep it in the template as I find it a very valuable tool. Please note that due to the lengthy loading time of Truffle Dashboard's `npm` package [`@truffle/dashboard-hardhat-plugin`](https://www.npmjs.com/package/@truffle/dashboard-hardhat-plugin), the module is disabled by default in the [`hardhat.config.ts`](./hardhat.config.ts) file. If you want to use it, you must uncomment the module import and the `truffle` configuration accordingly.
-
-[Truffle](https://archive.trufflesuite.com) developed the [Truffle Dashboard](https://archive.trufflesuite.com/docs/truffle/how-to/use-the-truffle-dashboard/) to provide an easy way to use your existing MetaMask wallet for your deployments and for other transactions that you need to send from a command line context. Because the Truffle Dashboard connects directly to MetaMask it is also possible to use it in combination with hardware wallets like [Ledger](https://www.ledger.com) or [Trezor](https://trezor.io).
-
-First, it is recommended that you install Truffle globally by running:
-
-```console
-npm install -g truffle
-```
-
-> If you have already installed Truffle, you need to ensure that you have at least version [`5.11.5`](https://github.com/trufflesuite/truffle/releases/tag/v5.11.5) installed and otherwise upgrade.
-
-To start a Truffle Dashboard, you need to run the following command in a separate terminal window:
-
-```console
-truffle dashboard
-```
-
-By default, the command above starts a Truffle Dashboard at `http://localhost:24012` and opens the Dashboard in a new tab in your default browser. The Dashboard then prompts you to connect your wallet and confirm that you're connected to the right network. **You should double check your connected network at this point, since switching to a different network during a deployment can have unintended consequences.**
-
-Eventually, in order to deploy with the Truffle Dashboard, you can simply run:
-
-```console
-pnpm deploy:dashboard
-```
-
-## Mainnet Forking
-
-You can start an instance of the Hardhat network that forks the mainnet. This means that it will simulate having the same state as the mainnet, but it will work as a local development network. That way you can interact with deployed protocols and test complex interactions locally. To use this feature, you need to connect to an archive node.
-
-This template is currently configured via the [`hardhat.config.ts`](./hardhat.config.ts) as follows:
-
-```ts
-forking: {
-  url: vars.get("ETH_MAINNET_URL", ethMainnetUrl),
-  // The Hardhat network will by default fork from the latest mainnet block
-  // To pin the block number, specify it below
-  // You will need access to a node with archival data for this to work!
-  // blockNumber: 14743877,
-  // If you want to do some forking, set `enabled` to true
-  enabled: false,
-},
-```
-
-## Contract Verification
-
-Change the contract address to your contract after the deployment has been successful. This works for both testnet and mainnet. You will need to get an API key from [etherscan](https://etherscan.io), [snowtrace](https://snowtrace.io) etc.
-
-**Example:**
-
-```console
-npx hardhat verify --network fantomMain --constructor-args arguments.js <YOUR_CONTRACT_ADDRESS>
-```
-
-## Contract Interaction
-
-This template includes an [example script](./scripts/interact.ts) that shows how to interact programmatically with a deployed contract. You must customise it according to your contract's specifications. The script can be simply invoked via:
-
-```console
-npx hardhat run scripts/interact.ts --network <network_name>
-```
-
-## Foundry
-
-This template repository also includes the [Foundry](https://github.com/foundry-rs/foundry) toolkit as well as the [`@nomicfoundation/hardhat-foundry`](https://hardhat.org/hardhat-runner/docs/advanced/hardhat-and-foundry) plugin.
-
-> If you need help getting started with Foundry, I recommend reading the [📖 Foundry Book](https://book.getfoundry.sh).
-
-### Dependencies
-
-```console
-make update
-```
-
-or
-
-```console
-forge update
-```
-
-### Compilation
-
-```console
-make build
-```
-
-or
-
-```console
+```sh
 forge build
 ```
 
-### Testing
+Run tests:
 
-To run only TypeScript tests:
-
-```console
+```sh
 pnpm test:hh
+forge test
 ```
 
-To run only Solidity tests:
+---
 
-```console
-pnpm test:forge
+## Repository Structure
+
+```
+contracts/
+  V3PositionHelper.sol
 ```
 
-or
+Only one helper exists today; more may be added later.
 
-```console
-make test-forge
-```
+---
 
-To additionally display the gas report, you can run:
+## Deployments
 
-```console
-make test-gasreport
-```
+| Network  | Address                                    |
+| -------- | ------------------------------------------ |
+| Ethereum | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Arbitrum | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Avalanche | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Base | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| BSC | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Linea | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Optimism | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Polygon | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Rootstock | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Scroll | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Sonic | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
+| Hemi | 0x34026A9b9Cb6DF84880C4B2f778F5965F5679c16 |
 
-### Deployment and Etherscan Verification
-
-Inside the [`scripts/`](./scripts) folder are a few preconfigured scripts that can be used to deploy and verify contracts via Foundry. These scripts are required to be _executable_ meaning they must be made executable by running:
-
-```console
-make scripts
-```
+---
