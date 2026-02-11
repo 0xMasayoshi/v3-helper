@@ -83,14 +83,15 @@ contract V3PositionHelperTest is Test {
             assertTrue(pos.token1 != address(0), "token1 must be non-zero");
 
             // Verify owed fees never underflow
-            (, , , , , , , , , , uint128 storedOwed0, uint128 storedOwed1) = positionManager.positions(id);
+            (,,,,,,,,,, uint128 storedOwed0, uint128 storedOwed1) = positionManager.positions(id);
             assertTrue(pos.tokensOwed0 >= storedOwed0, "tokensOwed0 should be >= storedOwed0");
             assertTrue(pos.tokensOwed1 >= storedOwed1, "tokensOwed1 should be >= storedOwed1");
         }
     }
 
     function testNonstandardFactoryPosition() public view {
-        INonfungiblePositionManager PCS_MANAGER_ADDRESS = INonfungiblePositionManager(0x46A15B0b27311cedF172AB29E4f4766fbE7F4364);
+        INonfungiblePositionManager PCS_MANAGER_ADDRESS =
+            INonfungiblePositionManager(0x46A15B0b27311cedF172AB29E4f4766fbE7F4364);
         uint256 TOKEN_ID = 69;
         Position memory position = positionHelper.getPosition(PCS_MANAGER_ADDRESS, TOKEN_ID);
         assertEq(position.tokenId, TOKEN_ID, "Error when getting non-standard factory position");

@@ -29,10 +29,11 @@ contract V3PositionHelper {
     /// @param positionManager The NonfungiblePositionManager address
     /// @param tokenId         The tokenId of the position
     /// @return position       The full Position struct with tokensOwed0/1 patched
-    function getPosition(
-        INonfungiblePositionManager positionManager,
-        uint256 tokenId
-    ) public view returns (Position memory position) {
+    function getPosition(INonfungiblePositionManager positionManager, uint256 tokenId)
+        public
+        view
+        returns (Position memory position)
+    {
         {
             (
                 uint96 nonce,
@@ -92,10 +93,11 @@ contract V3PositionHelper {
     /// @param positionManager The NonfungiblePositionManager address
     /// @param tokenIds        Array of position tokenIds
     /// @return positions      Array of full Position structs with updated fees
-    function getPositions(
-        INonfungiblePositionManager positionManager,
-        uint256[] calldata tokenIds
-    ) external view returns (Position[] memory positions) {
+    function getPositions(INonfungiblePositionManager positionManager, uint256[] calldata tokenIds)
+        external
+        view
+        returns (Position[] memory positions)
+    {
         uint256 count = tokenIds.length;
         positions = new Position[](count);
 
@@ -110,12 +112,11 @@ contract V3PositionHelper {
     /// @param skip             Number of positions to skip from the start of the list
     /// @param first            Maximum number of positions to return
     /// @return positions       Array of Position structs (at most `first` long)
-    function getUserPositions(
-        INonfungiblePositionManager positionManager,
-        address user,
-        uint256 skip,
-        uint256 first
-    ) external view returns (Position[] memory positions) {
+    function getUserPositions(INonfungiblePositionManager positionManager, address user, uint256 skip, uint256 first)
+        external
+        view
+        returns (Position[] memory positions)
+    {
         uint256 balance = positionManager.balanceOf(user);
         if (skip >= balance) {
             return new Position[](0);
